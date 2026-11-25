@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+"""Extract the race course (gate poses and sizes) from the competition obstacle mesh.
+
+The world `crazyflie_map` of laser-robotics-research/laser_crazyflie places all gates in one
+OBJ (`obstacles_crazyrun.obj`, one object per gate). For every object this tool finds:
+  * the frame plane from the top bar of the frame (PCA of its vertices),
+  * the opening centre, inner/outer size and frame depth,
+  * the direction of travel: the plane normal that points from the previous gate towards the
+    next one (the previous gate of the first one is the start position).
+Gate order = object order in the file (Cube, Cube.001, ...), which follows the loop around the
+arena starting next to the takeoff base. Pure Python (no numpy) so it runs anywhere.
+
+Usage: extract_course.py obstacles_crazyrun.obj [--start X Y] [--laps 7] > course.yaml
+"""
+
+from __future__ import annotations
+
+import argparse
+import math
+import sys
+from typing import Dict, List, Tuple
+
+Vec = Tuple[float, float, float]
+
+
+def parse_obj(path: str) -> Tuple[List[str], List[List[Vec]]]:
+    names: List[str] = []
+    members: List[set] = []
+    verts: List[Vec] = []
+    with open(path, 'r', encoding='utf-8', errors='ignore') as fh:
+        for line in fh:
+            p = line.split()
+            if not p:
+                continue
+            if p[0] == 'o':
+                names.append(p[1] if len(p) > 1 else f'object{len(names)}')
+                members.append(set())
+            elif p[0] == 'v':
+                verts.append((float(p[1]), float(p[2]), float(p[3])))
+            elif p[0] == 'f':
+                if not members:
+                    names.append('object0')
+                    members.append(set())
+                for tok in p[1:]:
+                    i = int(tok.split('/')[0])
+                    members[-1].add(i - 1 if i > 0 else len(verts) + i)
+    return names, [[verts[i] for i in sorted(m)] for m in members]
+
+
+def gate_geometry(vs: List[Vec]) -> Dict[str, float]:
+    zmax = max(v[2] for v in vs)
+    zs = sorted({round(v[2], 5) for v in vs})
+    # The top bar is the band of vertices within the bar thickness of the top.
+    band = [v for v in vs if v[2] >= zmax - 0.051]
+    mx = sum(v[0] for v in band) / len(band)
+    my = sum(v[1] for v in band) / len(band)
+    sxx = sum((v[0] - mx) ** 2 for v in band)
+    syy = sum((v[1] - my) ** 2 for v in band)
+    sxy = sum((v[0] - mx) * (v[1] - my) for v in band)
+    ang = 0.5 * math.atan2(2.0 * sxy, sxx - syy)
+    ux, uy = math.cos(ang), math.sin(ang)       # in-plane horizontal axis
+    nx, ny = -uy, ux                            # plane normal
+    us = [(v[0] - mx) * ux + (v[1] - my) * uy for v in band]
+    ns = [(v[0] - mx) * nx + (v[1] - my) * ny for v in band]
+    cu = 0.5 * (min(us) + max(us))
+    cn = 0.5 * (min(ns) + max(ns))
+    cx, cy = mx + cu * ux + cn * nx, my + cu * uy + cn * ny
+    outer_w = max(us) - min(us)
+    depth = max(ns) - min(ns)
+    # Bar thickness = height of the top band (outer top edge to the opening's top edge).
+    thickness = zmax - min(v[2] for v in band)
+    inner_half = 0.5 * outer_w - thickness
+    # The frame bottom is the lowest vertex at or beyond the opening's side edges; the support
+    # legs stand inside that width (|u| < inner_half) and are excluded. The outer corners of
+    # the frame are rounded, so the bottom edge itself only spans |u| <= inner_half.
+    allu = [(v[0] - cx) * ux + (v[1] - cy) * uy for v in vs]
+    frame_bottom = min(v[2] for v, u in zip(vs, allu) if abs(u) >= inner_half - 1e-3)
+    outer_h = zmax - frame_bottom
+    return {
+        'cx': cx, 'cy': cy, 'cz': 0.5 * (zmax + frame_bottom), 'normal_yaw': math.atan2(ny, nx),
+        'outer_w': outer_w, 'outer_h': outer_h, 'depth': depth, 'bar': thickness,
+        'inner_w': outer_w - 2.0 * thickness, 'inner_h': outer_h - 2.0 * thickness,
+        'levels': len(zs),
+    }
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
+    ap.add_argument('obj', help='obstacles_crazyrun.obj')
+    ap.add_argument('--start', nargs=2, type=float, default=[0.0, 0.0], metavar=('X', 'Y'))
+    ap.add_argument('--laps', type=int, default=7)
+    args = ap.parse_args(argv)
+
+    names, groups = parse_obj(args.obj)
+    gates = [gate_geometry(g) for g in groups]
+    n = len(gates)
+    out = []
+    for i, g in enumerate(gates):
+        prev = (args.start[0], args.start[1]) if i == 0 else (gates[i - 1]['cx'], gates[i - 1]['cy'])
+        nxt = (gates[(i + 1) % n]['cx'], gates[(i + 1) % n]['cy'])
+        d = (nxt[0] - prev[0], nxt[1] - prev[1])
+        yaw = g['normal_yaw']
+        if math.cos(yaw) * d[0] + math.sin(yaw) * d[1] < 0.0:
+            yaw += math.pi
+        yaw = (yaw + math.pi) % (2.0 * math.pi) - math.pi
+        out.append((i + 1, names[i], g, yaw))
+
+    w = sys.stdout.write
+    w('# Generated by icuas27_race/tools/extract_course.py from obstacles_crazyrun.obj\n')
+    for gid, name, g, yaw in out:
+        w(f'#   G{gid} {name:9s} centre=({g["cx"]:+.4f}, {g["cy"]:+.4f}, {g["cz"]:+.4f}) '
+          f'travel yaw={math.degrees(yaw):+8.3f} deg  inner={g["inner_w"]:.3f}x{g["inner_h"]:.3f} '
+          f'outer={g["outer_w"]:.3f}x{g["outer_h"]:.3f} depth={g["depth"]:.3f}\n')
+    g0 = out[0][2]
+    w('gate_defaults:\n')
+    w(f'  inner_width: {g0["inner_w"]:.4f}\n  inner_height: {g0["inner_h"]:.4f}\n')
+    w(f'  outer_width: {g0["outer_w"]:.4f}\n  outer_height: {g0["outer_h"]:.4f}\n')
+    w(f'  depth: {g0["depth"]:.4f}\n')
+    w('gates:\n')
+    for gid, name, g, yaw in out:
+        w(f'  - {{id: {gid}, name: {name}, center: [{g["cx"]:.4f}, {g["cy"]:.4f}, {g["cz"]:.4f}], '
+          f'yaw: {yaw:.6f}}}\n')
+    w(f'order: [{", ".join(str(o[0]) for o in out)}]\n')
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

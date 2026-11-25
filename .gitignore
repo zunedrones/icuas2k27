@@ -1,0 +1,18 @@
+# colcon
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+
+# race outputs (run directories, bags, reports)
+results/
+bags/
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# editors
+.vscode/
+.idea/
+*.swp

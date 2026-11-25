@@ -1,0 +1,40 @@
+# ICUAS 2027 simulation course: world `crazyflie_map` of laser-robotics-research/laser_crazyflie
+# (commit 0944388). World frame = Gazebo world (ENU, metres, radians).
+#
+# Gates generated with `ros2 run icuas27_race extract_course <obstacles_crazyrun.obj>` and checked
+# against the mesh: openings 0.5 x 0.5 m inside 0.6 x 0.6 m frames (5 cm bars, rounded outer
+# corners), 5 cm deep, standing on two posts. The rulebook gate order is still [TBD]; the order
+# below follows the objects of the mesh (Cube, Cube.001, ...), a clockwise loop (seen from above)
+# that starts next to the takeoff base. Each gate `yaw` is the direction of travel through it.
+#
+# Note: the collision mesh obstacles_crazyrun.stl only contains 6 gates (gate 7 / Cube.006 has
+# no collision in Gazebo). The referee and the plan validation use the OBJ, which has all 7.
+course:
+  name: crazyflie_map
+  description: ICUAS 2027 Phase 1 sample course (LASER UAV System, Gazebo Classic)
+  laps: 7                       # rulebook section 3.2
+  arena:                        # flight envelope: 5 x 5 x 2 m (base_crazyrun floor, rulebook height)
+    min: [-4.5, -4.5, 0.0]
+    max: [0.5, 0.5, 2.0]
+  landing_pad:                  # raised square of base_crazyrun under the spawn point
+    center: [0.0, 0.0, 0.0584]  # centre of the top surface
+    size: [0.564, 0.564]
+  start:                        # spawn pose (laser_uav_simulation spawn.yaml); the P3D ground
+    position: [0.0, 0.0, 0.2]   # truth is reported relative to it
+    rpy: [0.0, 0.0, 0.0]
+  obstacle_mesh: package://laser_gazebo_resources/models/obstacles_crazyrun/meshes/obstacles_crazyrun.obj
+  gate_defaults:
+    inner_width: 0.5
+    inner_height: 0.5
+    outer_width: 0.6
+    outer_height: 0.6
+    depth: 0.05
+  gates:
+    - {id: 1, name: Cube,     center: [-0.1170, -0.9779, 1.0744], yaw: -1.570796}
+    - {id: 2, name: Cube.001, center: [-0.3338, -2.7738, 0.5744], yaw: -2.186998}
+    - {id: 3, name: Cube.002, center: [-1.5549, -3.6973, 1.0744], yaw: -3.141593}
+    - {id: 4, name: Cube.003, center: [-3.2807, -3.5507, 0.5744], yaw: 2.267285}
+    - {id: 5, name: Cube.004, center: [-3.8832, -2.1469, 1.0744], yaw: 1.570797}
+    - {id: 6, name: Cube.005, center: [-3.1521, -0.4795, 1.0744], yaw: 0.226989}
+    - {id: 7, name: Cube.006, center: [-1.7419, -0.2185, 0.5744], yaw: 0.000000}
+  order: [1, 2, 3, 4, 5, 6, 7]

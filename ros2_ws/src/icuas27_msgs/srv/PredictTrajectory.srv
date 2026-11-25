@@ -1,0 +1,20 @@
+# Generate the trajectory that the LUS planning manager would produce for a fly-through
+# waypoint mission (same backend - PMM or MINCO - and parameters), without flying it.
+# Used to validate and visualise the race plan before sending it.
+laser_msgs/ReferenceState start          # start reference (the control manager's commanded state)
+laser_msgs/PoseWithHeading[] waypoints   # same semantics as laser_msgs/TrajectoryPath
+float64 speed                            # requested speed (m/s), 0 = planner default
+---
+bool success
+string message
+string planner                           # backend used: pmm | minco
+bool clean                               # false if the backend reported internal errors (the
+                                         # pinned PMM is then not deterministic)
+string planner_log                       # diagnostics printed by the backend
+float64[] times                          # sample times (s) from the trajectory start
+geometry_msgs/Point[] positions
+geometry_msgs/Vector3[] velocities
+geometry_msgs/Vector3[] accelerations
+float64[] headings                       # yaw of each reference sample (rad)
+float64 duration                         # total trajectory duration (s)
+float64 planning_ms                      # wall-clock generation time (ms)

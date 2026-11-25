@@ -1,0 +1,50 @@
+# ICUAS 2027 autonomous drone racing (ROS 2 Humble + LASER UAV System, Gazebo Classic).
+#
+#   xhost +local:docker
+#   docker compose build                       # first build takes a while (PX4 + LUS)
+#   docker compose run --rm sim                # interactive shell, workspace mounted
+#   ./scripts/race.sh                          # one race with Gazebo GUI + RViz
+#   ./scripts/batch.sh 3                       # three headless races + comparison report
+x-common: &common
+  image: icuas2k27:humble
+  privileged: true
+  network_mode: host
+  stdin_open: true
+  tty: true
+  environment:
+    - DISPLAY=${DISPLAY:-:0}
+    - QT_X11_NO_MITSHM=1
+    - LIBGL_ALWAYS_SOFTWARE=${LIBGL_ALWAYS_SOFTWARE:-1}
+    - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-27}
+    - ICUAS_GIT_COMMIT=${ICUAS_GIT_COMMIT:-}
+  volumes:
+    - ./results:/home/dev/results
+    - /tmp/.X11-unix:/tmp/.X11-unix:rw
+
+services:
+  # Development: this repository's ros2_ws is mounted and built inside the container.
+  sim:
+    <<: *common
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: race
+      args:
+        USER_UID: 1000
+        USER_GID: 1000
+        JOBS: 8
+    container_name: icuas2k27
+    volumes:
+      - ./ros2_ws:/home/dev/ros2_ws
+      - ./scripts:/home/dev/scripts:ro
+      - ./results:/home/dev/results
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    command: bash
+
+  # Evaluation-like run: workspace and scripts baked into the image (no source mount),
+  # one headless race, results in ./results.   docker compose --profile eval run --rm eval
+  eval:
+    <<: *common
+    container_name: icuas2k27_eval
+    command: /home/dev/scripts/run_race.sh --headless
+    profiles: ["eval"]

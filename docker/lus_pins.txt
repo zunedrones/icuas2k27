@@ -1,0 +1,36 @@
+# Pinned revisions of the LASER UAV System (LUS) and the ICUAS 2027 Crazyflie overlay.
+#
+# Snapshot used by the competition repository laser-robotics-research/laser_crazyflie
+# (commit 0944388, 2026-11-07): the five packages listed in its README are pinned to the
+# exact commits it names; every other package is pinned to the last commit of the branch
+# that laser_uav_system@3f2d1c7 tracked (stable, release/1.15, lus/stable) before that date.
+# PX4 stays on release/1.15 because the LUS move to PX4 1.17 (2026-11-17) is newer than the
+# Crazyflie overlay.
+#
+# The layout reproduces `gitman install`: laser_uav_system commits the symlinks
+# ros_packages/<pkg> -> ../.gitman/<name>/. and the checkouts live in .gitman/<name>
+# (laser_uav_planners and laser_uav_mappings repeat the pattern for their own packages).
+#
+# Format: <path relative to $HOME/git> <git url> <commit sha>
+# Entries are fetched in order (parents before nested checkouts).
+
+laser_uav_system                                                       https://github.com/LASER-Robotics/laser_uav_system.git         3f2d1c7de9538371be2642a21e09213d1a4fbbfa
+laser_uav_system/.gitman/laser_msgs                                    https://github.com/LASER-Robotics/laser_msgs.git               a32af870a6291726af9c3613851d8b38384d5eea
+laser_uav_system/.gitman/laser_uav_lib                                 https://github.com/LASER-Robotics/laser_uav_lib.git            12901eaff3bfc042a7d95f946ae33defbb918f86
+laser_uav_system/.gitman/laser_uav_hw_api                              https://github.com/LASER-Robotics/laser_uav_hw_api.git         2e19290bab65461e1af2a6c7ca624a6b0e92591a
+laser_uav_system/.gitman/laser_uav_managers                            https://github.com/LASER-Robotics/laser_uav_managers.git       277a3c9f7d161d8335afa72df75a6cd869491680
+laser_uav_system/.gitman/laser_uav_controllers                         https://github.com/LASER-Robotics/laser_uav_controllers.git    fca756ad4c2113077ca4000b3103af787b92eeeb
+laser_uav_system/.gitman/laser_uav_estimators                          https://github.com/LASER-Robotics/laser_uav_estimators.git     21b8b58ab7abe89c9a825b344cf7c2c6300df975
+laser_uav_system/.gitman/laser_uav_planners                            https://github.com/LASER-Robotics/laser_uav_planners.git       8aa841c1676601d73cfaa1873685dd6947a4204c
+laser_uav_system/.gitman/laser_uav_planners/.gitman/pmm_planner        https://github.com/LASER-Robotics/pmm_uav_planner.git          98ecebd784d874ddbf3e28ffff606e0ba2d39f1d
+laser_uav_system/.gitman/laser_uav_planners/.gitman/super_planner      https://github.com/LASER-Robotics/super_planner.git            39b80ac446b8ad79f9c3af053aac2ad1c5e36f8c
+laser_uav_system/.gitman/laser_uav_mappings                            https://github.com/LASER-Robotics/laser_uav_mappings.git       b965f2b6a8f649a7d1d6c686429a1c921646074e
+laser_uav_system/.gitman/laser_uav_mappings/.gitman/rog_map            https://github.com/LASER-Robotics/rog_map.git                  138019afb580f7d40fb437db04f96ab2f24f0a64
+laser_uav_system/.gitman/laser_uav_imu_filter                          https://github.com/LASER-Robotics/laser_uav_imu_filter.git     93af8865f6812146d73487478c7b45db886c1a03
+laser_uav_system/.gitman/laser_uav_simulation                          https://github.com/LASER-Robotics/laser_uav_simulation.git     d9f1be869a32104d0cfd855b468d2c10c0116771
+laser_uav_system/.gitman/laser_gazebo_resources                        https://github.com/LASER-Robotics/laser_gazebo_resources.git   dc0d250317d9b69bf25eab40b1f74656b2615579
+laser_uav_system/.gitman/laser_uav_tui                                 https://github.com/LASER-Robotics/laser_uav_tui.git            a29eede2044ea233b5ceff61c43590fa8bae97de
+laser_uav_system/.gitman/px4_msgs                                      https://github.com/LASER-Robotics/px4_msgs.git                 a1045ec4feb6d709bdecaf3895f1d5b43a5dabb8
+laser_uav_system/.gitman/Micro-XRCE-DDS-Agent                          https://github.com/LASER-Robotics/Micro-XRCE-DDS-Agent.git     8a1bfec3bf1bb0c4d0a0dc445c916e7ae36b68ab
+laser_uav_system/.gitman/px4_firmware-ROS2-                            https://github.com/LASER-Robotics/px4_firmware-ROS2-.git       559b693cfa399061f3a01d3df9fd3833b17dc0a6
+laser_crazyflie                                                        https://github.com/laser-robotics-research/laser_crazyflie.git 0944388bd22c32618f12130811fe55f32c90a2c0

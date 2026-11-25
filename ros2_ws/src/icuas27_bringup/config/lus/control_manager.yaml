@@ -1,0 +1,48 @@
+# LUS control manager parameters for the race (template).
+# Based on laser_uav_managers@277a3c9 params/control_manager.yaml; changes are marked [race].
+# The launch file writes the final copy to <run_dir>/config/control_manager.yaml with the
+# safe_area computed from the course arena (estimation frame = drone resting pose).
+/**/**:
+  ros__parameters:
+    rate: # Hz
+      external_loop_control: 100.0
+      internal_loop_control: 250.0
+      diagnostics: 100.0
+
+    takeoff:
+      height: 1.0 # m above the resting pose [race] ~ height of the first gate
+      speed: 1.2  # m/s peak of the quintic takeoff profile [race]
+
+    land:
+      increment_rampdown: 0.15 # [0, 1]
+      threshold_detect: 0.70 # [0, 1]
+      speed: 0.5 # m/s [race] (stock 0.3): the race clock stops at touchdown
+
+    reference:
+      timeout: 0.50 # seconds since the last native trajectory window
+
+    goal:
+      position_tolerance: 0.15 # [race] (stock 0.45) also read by the planning manager
+      heading_tolerance: 3.15
+
+    debug:
+      publish_reference_path: true
+
+    benchmark_metrics:
+      enabled: false
+      csv_path: /tmp/laser_uav_control_metrics.csv
+
+    filter_params:
+      butterworth:
+        gyro_a: [1.0000, -1.5782, 0.6528]
+        gyro_b: [0.018650, 0.037301, 0.018650]
+
+        motor_a: [1.0000, -1.5782, 0.6528]
+        motor_b: [0.018650, 0.037301, 0.018650]
+
+    safe_area:
+      enabled: true # [race] hold inside the arena if a reference ever leaves it
+      constraints:  # overwritten at launch from the course arena
+        x: [-4.45, 0.45]
+        y: [-4.45, 0.45]
+        z: [0.10, 1.90]

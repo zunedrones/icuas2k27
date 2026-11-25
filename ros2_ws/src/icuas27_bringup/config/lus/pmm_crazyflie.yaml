@@ -1,0 +1,36 @@
+# PMM planner limits for racing the Crazyflie (read by the LUS planning manager and by our
+# trajectory_predictor, so the validated prediction is exactly the flown reference).
+# Based on laser_crazyflie@0944388 laser_uav_planners/.../pmm_planner/params/crazyflie.yaml.
+#
+# max_accel bounds the thrust acceleration |a - g|. The Crazyflie model can produce
+# total_thrust_max / mass = 0.40 N / 0.02803 kg = 14.3 m/s^2; the race keeps a margin below that
+# so the NMPC still has authority to correct tracking errors.
+/**/**:
+  ros__parameters:
+    pmm_planner:
+      multirotor_parameters:
+        max_accel: 12.0   # m/s^2 [race] (overlay 14.0)
+        max_vel: 3.0      # m/s, also capped by the mission speed
+        default_vel: 1.0
+
+      ltd_opt:
+        use_drag: false
+        thrust_decomp_acc_precision: 0.01
+        thrust_decomp_max_iter: 20
+
+      first_vel_opt:
+        alpha: 10.0
+        alpha_reduction_factor: 0.2
+        alpha_min_threshold: 0.001
+        max_iter: 30
+
+      second_vel_opt:
+        run: true
+        alpha: 35.0
+        alpha_reduction_factor: 0.1
+        alpha_min_threshold: 0.01
+        max_iter: 10
+
+      time:
+        dt_precision: 0.001
+        sampling_step: 0.01 # DON'T CHANGE (planning manager sampling)

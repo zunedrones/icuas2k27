@@ -1,0 +1,12 @@
+# NMPC for the Crazyflie commanding body rates + collective thrust; PX4's rate controller (gains
+# of the Crazyflie airframe 22002_crazyflie) closes the inner loop instead of the LUS INDI.
+# Same weights as laser_crazyflie@0944388 laser_uav_controllers/params/nmpc_controller/crazyflie.yaml.
+/**/**:
+  ros__parameters:
+    nmpc_controller:
+      nmpc_mode: "angular_rates_and_thrust"
+      N: 20 # Horizon length
+      dt: 0.05 # Discrete step in horizon
+      # {W_position_xy, W_position_z, W_rotation_xy, W_rotation_z, W_speed, W_angular_speed}
+      Q: [40.0, 20.0, 0.3, 1.0, 0.3, 0.3]
+      R: 1000.0

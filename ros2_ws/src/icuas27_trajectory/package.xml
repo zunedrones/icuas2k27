@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>icuas27_trajectory</name>
+  <version>0.1.0</version>
+  <description>
+    Offline twin of the LUS planning-manager trajectory generation (PMM and MINCO backends):
+    predicts the reference a waypoint mission will produce so the race plan can be validated and
+    visualised before flight.
+  </description>
+  <maintainer email="zunedrones@example.com">zunedrones</maintainer>
+  <license>BSD-3-Clause</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>geometry_msgs</depend>
+  <depend>laser_msgs</depend>
+  <depend>icuas27_msgs</depend>
+  <depend>pmm_planner</depend>
+  <depend>super_planner</depend>
+  <depend>eigen</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

@@ -1,0 +1,12 @@
+# LUS PX4 hardware API in body-rate mode (must match nmpc_controller.nmpc_mode).
+/**/**:
+  ros__parameters:
+    rate: # [Hz]
+      pub_offboard_control_mode: 100.0
+      pub_api_diagnostic: 10.0
+    control_input_mode: "angular_rates_and_thrust"
+    rc:
+      aux_logics: true
+    tf:
+      publish: false
+      inverted: false

@@ -1,0 +1,8 @@
+# Crazyflie with ground truth (used for state estimation in simulation, per the rulebook).
+/**/**:
+  ros__parameters:
+    - id: 1
+      type: "crazyflie"
+      fcu: "px4"
+      pose_spawn: [0.0, 0.0, 0.2, 0.0] # x y z yaw (must match course start)
+      sensors: "--enable_ground_truth"

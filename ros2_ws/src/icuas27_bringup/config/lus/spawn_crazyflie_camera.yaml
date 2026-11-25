@@ -1,0 +1,9 @@
+# Crazyflie with ground truth and the AI-deck camera (mono8 324x244 @ 30 Hz on
+# /uav1/camera/ai_deck/image_raw). The camera needs OpenGL rendering (X display or Xvfb).
+/**/**:
+  ros__parameters:
+    - id: 1
+      type: "crazyflie"
+      fcu: "px4"
+      pose_spawn: [0.0, 0.0, 0.2, 0.0] # x y z yaw (must match course start)
+      sensors: "--enable_ground_truth --enable_ai_deck"

@@ -1,0 +1,57 @@
+# Parameters of the ICUAS 2027 race nodes. course_file, run_dir and the LUS parameter files are
+# passed by the launch file.
+
+race_manager:
+  ros__parameters:
+    auto_start: true            # false: wait for `ros2 service call /race/start std_srvs/srv/Trigger`
+    auto_start_delay: 2.0       # s in READY before the automatic start command
+    alignment_mode: ground_truth   # ground_truth (simulation) | identity (mocap) | start_pose
+    alignment_samples: 50
+    race_speed: 3.0             # mission speed (m/s), capped by pmm max_vel
+    approach_distance: 0.40     # pre-gate waypoint before each gate plane (m)
+    exit_distance: 0.40         # post-gate waypoint after each gate plane (m)
+    heading_mode: constant      # constant | gate
+    constant_heading: 0.0       # world yaw for the constant mode (rad)
+    final_height: 0.30          # hover above the landing base before landing (m)
+    validate_plan: true         # predict the exact PMM trajectory and check it before flying
+    require_valid_plan: true    # refuse to fly an invalid plan
+    hull_radius: 0.07
+    min_clearance: 0.06         # required plan clearance to the gate structures (m)
+    wall_margin: 0.20           # required plan distance to the arena walls (m)
+    ceiling_margin: 0.20
+    min_height: 0.15
+    recovery_enabled: true      # retry a missed gate by flying around it
+    max_recoveries: 3
+    recovery_lateral: 0.75
+    recovery_depth: 0.60
+    system_timeout: 240.0
+    arm_timeout: 20.0
+    takeoff_timeout: 40.0
+    landing_timeout: 30.0
+    race_timeout_margin: 30.0
+    land_on_abort: true
+
+race_referee:
+  ros__parameters:
+    hull_radius: 0.07           # Crazyflie rotor-tip radius (m)
+    hull_half_height: 0.025
+    penalty_per_incident: 5.0   # rulebook eq. (1)
+    time_limit: 300.0
+    beside_radius: 1.0
+    contact_window: 0.15
+    landed_speed: 0.10
+    landed_height: 0.06
+    landed_settle_time: 0.30
+    crash_tilt_deg: 75.0
+    floor_height: 0.10
+    airborne_height: 0.15
+    bounds_margin: 0.0
+
+race_visualizer:
+  ros__parameters:
+    drone_scale: 3.0            # the real Crazyflie is 9 cm wide: scaled up to be visible
+    max_speed_color: 4.0
+
+gt_odometry_bridge:
+  ros__parameters:
+    rest_time: 1.0
